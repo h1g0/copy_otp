@@ -87,6 +87,8 @@ if __name__ == '__main__':
             print('QR code not found.')
             skey = input_skey()
 
+        set_skey(skey)
+
     result = get_totp(skey)
     pyperclip.copy(result)
     print(f'OTP {result} copied!')
