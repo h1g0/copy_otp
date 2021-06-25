@@ -58,8 +58,11 @@ def parse_otpauth_uri(uri: str) -> dict:
 
 
 def read_qr_image(file_path: str) -> str:
-    d = decode(Image.open(file_path))
-    return d[0].data.decode("utf-8")
+    if(os.path.exists(file_path)):
+        d = decode(Image.open(file_path))
+        return d[0].data.decode("utf-8")
+    else:
+        return ''
 
 
 def check_is_base32(key: str) -> bool:
@@ -71,12 +74,17 @@ if __name__ == '__main__':
     skey: str = get_skey()
     if(not skey):
         #skey = input_skey()
-        uri = parse_otpauth_uri(read_qr_image(qr_image))
-        if(uri['valid']):
-            skey = uri['secret']
-            os.remove(qr_image)
+        uri_str = read_qr_image(qr_image)
+        if(uri_str):
+            uri = parse_otpauth_uri(uri_str)
+            if(uri['valid']):
+                skey = uri['secret']
+                os.remove(qr_image)
+            else:
+                print('Invalid QR code!')
+                skey = input_skey()
         else:
-            print('Invalid QR code!')
+            print('QR code not found.')
             skey = input_skey()
 
     result = get_totp(skey)
